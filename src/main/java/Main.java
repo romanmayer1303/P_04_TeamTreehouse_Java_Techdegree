@@ -70,6 +70,14 @@ public class Main {
             }
         });
 
+        before(":slug/delete", (request, response) -> {
+            if (request.attribute("admin") == null) {
+                setFlashMessage(request, "Whoops, please sign in first.");
+                response.redirect("/password");
+                halt();
+            }
+        });
+
         get("/", (request, response) -> {
             Map<String, Object> model = new HashMap<>();
             model.put("entries", dao.findAllEntries());
@@ -82,6 +90,16 @@ public class Main {
             return new ModelAndView(model, "index.hbs");
         }, new HandlebarsTemplateEngine());
 
+        get("/details/index", (request, response) -> {
+            Map<String, Object> model = new HashMap<>();
+            model.put("entries", dao.findAllEntries());
+            return new ModelAndView(model, "index.hbs");
+        }, new HandlebarsTemplateEngine());
+
+        get("/details/new", (request, response) -> {
+            return new ModelAndView("", "new.hbs");
+        }, new HandlebarsTemplateEngine());
+
         get("/details/:slug", (request, response) -> {
             Map<String, Object> model = new HashMap<>();
             model.put("entry", dao.findEntryBySlug(request.params("slug")));
@@ -89,22 +107,29 @@ public class Main {
         }, new HandlebarsTemplateEngine());
 
         get("/:slug/edit", (request, response) -> {
-            System.out.println("slug-get");
             Map<String, Object> model = new HashMap<>();
             model.put("entry", dao.findEntryBySlug(request.params("slug")));
             return new ModelAndView(model, "edit.hbs");
         }, new HandlebarsTemplateEngine());
 
         post("/:slug/edit", (request, response) -> {
-            System.out.println("slug-post");
             BlogEntry entry = dao.findEntryBySlug(request.params("slug"));
             entry.setTitle(request.queryParams("title"));
             entry.setText(request.queryParams("text"));
-
-            System.out.println(request.queryParams("title"));
-            System.out.println(request.queryParams("text"));
-
             response.redirect("/details/" + entry.getSlug());
+            return null;
+        });
+
+        get("/:slug/delete", (request, response) -> {
+            Map<String, Object> model = new HashMap<>();
+            model.put("entry", dao.findEntryBySlug(request.params("slug")));
+            return new ModelAndView(model, "delete.hbs");
+        }, new HandlebarsTemplateEngine());
+
+        post("/:slug/delete", (request, response) -> {
+            BlogEntry entry = dao.findEntryBySlug(request.params("slug"));
+            dao.deleteEntry(entry);
+            response.redirect("/");
             return null;
         });
 
@@ -132,6 +157,16 @@ public class Main {
             String text = request.queryParams("entry");
             dao.addEntry(new BlogEntry(author, title, text));
             response.redirect("/");
+            return null;
+        });
+
+        post("/:slug/add-comment" ,(request, response) -> {
+            String commentAuthor = request.queryParams("name");
+            String commentText = request.queryParams("comment");
+            Comment comment = new Comment(commentAuthor, commentText);
+            BlogEntry entry = dao.findEntryBySlug(request.params("slug"));
+            entry.addComment(comment);
+            response.redirect("/details/" + entry.getSlug());
             return null;
         });
 

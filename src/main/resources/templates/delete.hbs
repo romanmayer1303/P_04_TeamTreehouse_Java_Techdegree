@@ -1,5 +1,4 @@
 {{#partial "content"}}
-
     <header>
         <div class="container">
             <div class="site-header">
@@ -12,23 +11,19 @@
     <section>
         <div class="container">
             <div class="edit-entry">
-                <h2>Edit Entry</h2>
-                <form action="/{{entry.slug}}/edit" method="post">
+                <h2>Delete Entry</h2>
+                <p>If you are sure, you want to delete the entry
+                    called <b>{{entry.title}}</b>, presse the delete button.</p>
 
-                    <label for="title"> Title</label>
-                    <input type="text" name="title" value={{entry.title}}><br>
+                <form action="/{{entry.slug}}/delete" method="post">
 
-                    <label for="text">Entry</label>
-                    <textarea rows="5" name="text">{{entry.text}}</textarea>
-
-                    <input type="submit" value="Save Entry" class="button">
+                    <input type="submit" value="Delete Entry" class="button">
                     <a href="#" class="button button-secondary">Cancel</a>
 
                 </form>
             </div>
         </div>
     </section>
-
 {{/partial}}
 
 {{>base.hbs}}

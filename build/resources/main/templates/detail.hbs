@@ -1,4 +1,14 @@
 {{#partial "content"}}
+
+    <header>
+        <div class="container">
+            <div class="site-header">
+                <a class="logo" href="../..">SparkBlog</a>
+                <a class="new-entry button button-round" href="../new"><i class="material-icons">create</i></a>
+            </div>
+        </div>
+    </header>
+
     <section>
         <div class="container">
             <div class="entry-list single">
@@ -8,6 +18,7 @@
                     <div class="entry">
                         <p>{{entry.text}}</p>
                         <p><a class="link" href="../{{entry.slug}}/edit">Edit Entry</a></p>
+                        <p><a class="link" href="../{{entry.slug}}/delete">Delete Entry</a></p>
                     </div>
                 </article>
             </div>
@@ -25,39 +36,20 @@
                 </div>
             {{/each}}
             <div class="new-comment">
-                <form>
+                <form action="/{{entry.slug}}/add-comment" method="post">
+
                     <label for="name"> Name</label>
                     <input type="text" name="name"><br>
+
                     <label for="comment">Comment</label>
                     <textarea rows="5" name="comment"></textarea>
+
                     <input type="submit" value="Post Comment" class="button">
                 </form>
             </div>
         </div>
     </section>
 
-
-<!--
-    <section class="entry-comments">
-        <div class="container">
-            <h2>Comments</h2>
-            <div class="comment">
-                <strong>Carling Kirk</strong>
-                <time datetime="2016-01-31 1:00">January 31, 2016 at 1:00</time>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut rhoncus felis, vel tincidunt neque. Vestibulum ut metus eleifend, malesuada nisl at, scelerisque sapien. Vivamus pharetra massa libero, sed feugiat turpis efficitur at.</p>
-            </div>
-            <div class="new-comment">
-                <form>
-                    <label for="name"> Name</label>
-                    <input type="text" name="name"><br>
-                    <label for="comment">Comment</label>
-                    <textarea rows="5" name="comment"></textarea>
-                    <input type="submit" value="Post Comment" class="button">
-                </form>
-            </div>
-        </div>
-    </section>
-    -->
 {{/partial}}
 
 {{> base.hbs}}

@@ -14,6 +14,7 @@ public class BlogEntry {
     private String title;
     private List<Comment> commentList;
     private String slug;
+    private List<String> tags;
 
     public BlogEntry(String author, String title, String text) {
         this.author = author;
@@ -23,6 +24,7 @@ public class BlogEntry {
         this.commentList = new ArrayList<>();
         Slugify slugify = new Slugify();
         this.slug = slugify.slugify(title);
+        this.tags = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -47,6 +49,14 @@ public class BlogEntry {
 
     public String getSlug() {
         return slug;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public void setText(String text) {
