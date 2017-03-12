@@ -27,6 +27,19 @@ public class BlogEntry {
         this.tags = new ArrayList<>();
     }
 
+    public BlogEntry(String author, String title, String text, ArrayList<String> tags) {
+        this.author = author;
+        this.date = new Date();
+        this.text = text;
+        this.title = title;
+        this.commentList = new ArrayList<>();
+        Slugify slugify = new Slugify();
+        this.slug = slugify.slugify(title);
+        this.tags = tags;
+    }
+
+
+
     public String getTitle() {
         return title;
     }

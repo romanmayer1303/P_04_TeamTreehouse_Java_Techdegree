@@ -15,6 +15,12 @@
                 <article>
                     <h1>{{entry.title}}</h1>
                     <time datetime="2016-01-31 1:00">{{entry.date}}</time>
+                    <ul>
+                        <li>Tags:</li>
+                        {{#each entry.tags}}
+                            <li>#{{this}}</li>
+                        {{/each}}
+                    </ul>
                     <div class="entry">
                         <p>{{entry.text}}</p>
                         <p><a class="link" href="../{{entry.slug}}/edit">Edit Entry</a></p>

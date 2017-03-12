@@ -1,4 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.teamtreehouse.blog.dao.BlogDao;
 import com.teamtreehouse.blog.dao.SimpleBlogDAO;
 import com.teamtreehouse.blog.model.BlogEntry;
@@ -7,6 +6,7 @@ import spark.ModelAndView;
 import spark.Request;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,58 +20,69 @@ public class Main {
     public static void main(String[] args) {
 
         staticFileLocation("/public");
-//        staticFileLocation("/css");
 
         // in memory data structure based DAO
         // switch out with database
         // just for prototyping
         BlogDao dao = new SimpleBlogDAO();
-
-        //TODO:rm how can I escape the html tags like <a ....> ?
-        BlogEntry blogEntry = new BlogEntry(
-                "Roman", "FML", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                "Nunc ut rhoncus felis, vel tincidunt neque. Vestibulum ut metus eleifend, malesuada nisl at, " +
-                "scelerisque sapien. Vivamus pharetra massa libero, sed feugiat turpis efficitur at.\n" +
-                "Cras egestas ac ipsum in posuere. Fusce suscipit, libero id malesuada placerat, orci velit semper" +
-                " metus, quis pulvinar sem nunc vel augue. In ornare tempor metus, sit amet congue justo porta et." +
-                " Etiam pretium, sapien non fermentum consequat, \\<a href=\"\">dolor augue\\</a\\> gravida lacus, " +
-                "non accumsan lorem odio id risus. Vestibulum pharetra tempor molestie. Integer sollicitudin ante" +
-                " ipsum, a luctus nisi egestas eu. Cras accumsan cursus ante, non dapibus tempor."
-        );
-        blogEntry.addComment(new Comment("Arthur", "this is my first comment."));
-        dao.addEntry(blogEntry);
-        dao.addEntry(new BlogEntry(
-                "Doug Heffernan", "The Best Cheesecake", "yolo"
-        ));
-        dao.addEntry(new BlogEntry(
-                "Aleks", "How To ...",
-                "asdfas;dfasdfasdfasdfasdf"
-        ));
+        fillBlogWithEntries(dao);
 
         before((request, response) -> {
-            if (request.cookie("admin") != null) {
-                request.attribute("admin", request.cookie("admin"));
+            if (request.cookie("username") != null) {
+                request.attribute("username", request.cookie("username"));
             }
         });
 
         before("/new", ((request, response) -> {
-            if (request.attribute("admin") == null) {
+            String password = request.attribute("username");
+            if (password == null || !password.equals("admin")) {
                 setFlashMessage(request, "Whoops, please sign in first.");
-                response.redirect("/password");
+                response.redirect("/password?redirectTo=new");
                 halt();
             }
         }));
 
+// ---- EDIT ----
         before(":slug/edit", (request, response) -> {
-            if (request.attribute("admin") == null) {
-                setFlashMessage(request, "Whoops, please sign in first.");
-                response.redirect("/password");
+            if (request.attribute("username") == null) {
+                String slug = request.params("slug");
+                System.out.println(slug);
+                response.redirect("/password?slug="+slug+"&redirectTo=edit");
                 halt();
             }
         });
 
+        get("/password", (request, response) -> {
+            Map<String, Object> model = new HashMap<>();
+            String slug = request.queryParams("slug");
+            model.put("slug", slug);
+            String redirectTo = request.queryParams("redirectTo");
+            model.put("redirectTo", redirectTo);
+            System.out.println(slug);
+            System.out.println(redirectTo);
+            return new ModelAndView(model, "password.hbs");
+        }, new HandlebarsTemplateEngine());
+
+        post("/password", (request, response) -> {
+            String username = request.queryParams("username");
+            String slug = request.queryParams("slug");
+            String redirectTo = request.queryParams("redirectTo");
+            if (username.equals("admin")) {
+                response.cookie("username", username);
+                if (!slug.equals("")) {
+                    response.redirect("/" + slug + "/" + redirectTo);
+                } else {
+                    response.redirect("/" + redirectTo);
+                }
+                halt();
+            }
+            response.redirect("/password");
+            return null;
+        });
+// --------------
+
         before(":slug/delete", (request, response) -> {
-            if (request.attribute("admin") == null) {
+            if (request.attribute("username") == null) {
                 setFlashMessage(request, "Whoops, please sign in first.");
                 response.redirect("/password");
                 halt();
@@ -133,19 +144,7 @@ public class Main {
             return null;
         });
 
-        get("/password", (request, response) -> {
-            Map<String, Object> model = new HashMap<>();
-            return new ModelAndView(model, "password.hbs");
-        }, new HandlebarsTemplateEngine());
 
-        post("/sign-in", (request, response) -> {
-            Map<String, String> model = new HashMap<>();
-            String password = request.queryParams("password");
-            response.cookie("admin", password);
-            model.put("admin", password);
-            response.redirect("/");
-            return null;
-        });
 
         get("/new", (request, response) -> {
             return new ModelAndView("", "new.hbs");
@@ -172,6 +171,33 @@ public class Main {
 
 
 
+    }
+
+    private static void fillBlogWithEntries(BlogDao dao) {
+        ArrayList<String> a = new ArrayList<>();
+        a.add("tag1");
+        a.add("tag2");
+        //TODO:rm how can I escape the html tags like <a ....> ?
+        BlogEntry blogEntry = new BlogEntry(
+                "Roman", "FML", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Nunc ut rhoncus felis, vel tincidunt neque. Vestibulum ut metus eleifend, malesuada nisl at, " +
+                "scelerisque sapien. Vivamus pharetra massa libero, sed feugiat turpis efficitur at.\n" +
+                "Cras egestas ac ipsum in posuere. Fusce suscipit, libero id malesuada placerat, orci velit semper" +
+                " metus, quis pulvinar sem nunc vel augue. In ornare tempor metus, sit amet congue justo porta et." +
+                " Etiam pretium, sapien non fermentum consequat, \\<a href=\"\">dolor augue\\</a\\> gravida lacus, " +
+                "non accumsan lorem odio id risus. Vestibulum pharetra tempor molestie. Integer sollicitudin ante" +
+                " ipsum, a luctus nisi egestas eu. Cras accumsan cursus ante, non dapibus tempor.",
+                a
+        );
+        blogEntry.addComment(new Comment("Arthur", "this is my first comment."));
+        dao.addEntry(blogEntry);
+        dao.addEntry(new BlogEntry(
+                "Doug Heffernan", "The Best Cheesecake", "yolo"
+        ));
+        dao.addEntry(new BlogEntry(
+                "Aleks", "How To ...",
+                "asdfas;dfasdfasdfasdfasdf"
+        ));
     }
 
     private static void setFlashMessage(Request request, String message) {

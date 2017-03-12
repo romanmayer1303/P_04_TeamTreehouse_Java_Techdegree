@@ -121,6 +121,9 @@ a.link {
 	font-family: 'Noto Sans', sans-serif;
 }
 
+ul li {
+	display: inline;
+}
 
 
 /* ==========================================================================
