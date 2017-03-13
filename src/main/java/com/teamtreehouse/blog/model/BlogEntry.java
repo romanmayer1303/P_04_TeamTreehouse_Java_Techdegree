@@ -2,9 +2,7 @@ package com.teamtreehouse.blog.model;
 
 import com.github.slugify.Slugify;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class BlogEntry {
 
@@ -14,7 +12,7 @@ public class BlogEntry {
     private String title;
     private List<Comment> commentList;
     private String slug;
-    private List<String> tags;
+    private Set<String> tags;
 
     public BlogEntry(String author, String title, String text) {
         this.author = author;
@@ -24,10 +22,10 @@ public class BlogEntry {
         this.commentList = new ArrayList<>();
         Slugify slugify = new Slugify();
         this.slug = slugify.slugify(title);
-        this.tags = new ArrayList<>();
+        this.tags = new HashSet<>();
     }
 
-    public BlogEntry(String author, String title, String text, ArrayList<String> tags) {
+    public BlogEntry(String author, String title, String text, HashSet<String> tags) {
         this.author = author;
         this.date = new Date();
         this.text = text;
@@ -64,11 +62,11 @@ public class BlogEntry {
         return slug;
     }
 
-    public List<String> getTags() {
+    public Set<String> getTags() {
         return tags;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(Set<String> tags) {
         this.tags = tags;
     }
 

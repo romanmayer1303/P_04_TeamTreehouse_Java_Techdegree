@@ -6,7 +6,7 @@
 body {
 	background: url(../../concepts/JavaTechdegree_SparkBlog_1.jg) top center no-repeat;
 	font-size: 15px;
-	color: #000;
+	color: #111;
 	font-family: 'Noto Serif', Georgia, serif;
 	background: #444;
 }
@@ -123,6 +123,16 @@ a.link {
 
 ul li {
 	display: inline;
+	list-style: none;
+	padding-left: 0;
+}
+
+ul {
+	padding: 0;
+}
+
+li {
+	padding: 0;
 }
 
 
